@@ -1,7 +1,7 @@
 FROM quay.io/samsung_cnct/k2-tools:latest
 
-ARG K2_REPO=https://github.com/samsung-cnct/k2.git
-ARG K2_BRANCH=master
+ARG K2_REPO=https://github.com/dstorck/k2.git
+ARG K2_BRANCH=ds-for-k2cli-testing
 ARG K2_SHA=""
 
 RUN 	apk update && \
