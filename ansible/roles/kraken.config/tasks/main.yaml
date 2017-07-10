@@ -53,6 +53,9 @@
     subschema_dir: "{{ subschema_dir }}"
   register: validation
 
+- fail:
+    msg: fail fail fail 
+
 - name: Set deprecation fact
   set_fact:
     deprecated: "{{ validation.result.schema.deprecated | default(false) }}"
