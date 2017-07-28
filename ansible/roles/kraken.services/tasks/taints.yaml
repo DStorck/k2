@@ -1,0 +1,34 @@
+---
+- set_fact:
+    cluster: "{{ cluster_node_tuple.0 }}"
+    node: "{{ cluster_node_tuple.1 }}"
+
+- name: Look up and set k8s minor version for this cluster
+  set_fact:
+    kubernetes_minor_version: "{{ kubernetes_minor_versions[cluster.name] }}"
+
+- name: Execute appropriate kubectl per minor version
+  set_fact:
+    kubectl: "/opt/cnct/kubernetes/{{ kubernetes_minor_version }}/bin/kubectl"
+
+- debug: var=node
+
+
+
+- name: Set taints for node
+  set_fact:
+    taintTest: hey there
+  when: node.nodeConfig.taints is defined
+
+- debug: var=taintTest
+
+- name: go taints go
+  command: >
+    {{ kubectl }} taint nodes  {{ node }} {{ item.key }}={{ item.value }}:{{ item.effect }}
+  with_items: "{{ node.nodeConfig.taints }}"
+  when: node.nodeConfig.taints is defined
+
+
+
+- fail:
+    msg: time to fail
