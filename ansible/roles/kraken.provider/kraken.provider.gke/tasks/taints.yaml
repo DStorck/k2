@@ -30,3 +30,4 @@
     - "{{ nodes_in_nodepool }}"
     - "{{ node.nodeConfig.taints }}"
   when: node.nodeConfig.taints is defined
+  ignore_errors: yes 
