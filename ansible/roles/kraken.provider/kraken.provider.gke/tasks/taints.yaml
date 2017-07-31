@@ -1,0 +1,36 @@
+
+
+- set_fact:
+    cluster: "{{ cluster_node_tuple.0 }}"
+    node: "{{ cluster_node_tuple.1 }}"
+
+
+- name: Look up and set k8s minor version for this cluster
+  set_fact:
+    kubernetes_minor_version: "{{ kubernetes_minor_versions[cluster.name] }}"
+
+- name: Execute appropriate kubectl per minor version
+  set_fact:
+    kubectl: "/opt/cnct/kubernetes/{{ kubernetes_minor_version }}/bin/kubectl"
+    kubeconfig: "{{ config_base | expanduser }}/{{ cluster.name }}/admin.kubeconfig"
+
+- debug: var=node
+- debug: var=node.nodeConfig.taints
+  when: node.nodeConfig.taints is defined
+
+- name: Collect all node names
+  command: >
+    {{ kubectl }} --kubeconfig={{ kubeconfig }} get nodes -l k2nodepool={{ node.name }} --output=custom-columns=NAME:.metadata.name --no-headers=true
+  register: node_names
+  ignore_errors: yes
+
+- name: set_fact
+  set_fact:
+    the_nodes: "{{ node_names.stdout_lines }}"
+
+- debug: var=node_names.stdout_lines
+
+- name: taint the nodes
+  command: >
+    {{ kubectl }} --kubeconfig={{ kubeconfig }} taint nodes {{ item }} key1=value1:NoSchedule
+  with_items: "{{ the_nodes }}"
