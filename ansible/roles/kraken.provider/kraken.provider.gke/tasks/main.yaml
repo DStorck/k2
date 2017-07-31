@@ -37,7 +37,4 @@
     - nodePools
   loop_control:
     loop_var: cluster_node_tuple
-  when: kraken_action == 'up'
-
-- fail:
-    msg: fail ha ha !
+  when: kraken_action == 'up' and cluster_node_tuple.1.nodeConfig.taints is defined
